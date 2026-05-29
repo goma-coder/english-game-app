@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10233f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="中2英語">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>中2英語 語順ゲーム</title>
+  <style>
+    :root {
+      --navy: #10233f;
+      --navy-2: #163456;
+      --blue: #2f6da8;
+      --orange: #f28a2e;
+      --orange-2: #ffb15d;
+      --paper: #f7f9fc;
+      --card: #ffffff;
+      --ink: #162033;
+      --muted: #637083;
+      --line: #dbe3ef;
+      --good: #1f9d68;
+      --bad: #d94f45;
+      --yellow: #ffd166;
+      --shadow: 0 14px 30px rgba(16, 35, 63, 0.12);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+      background:
+        linear-gradient(180deg, #10233f 0 265px, #eef3f9 265px 100%);
+      min-height: 100vh;
+      letter-spacing: 0;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .app {
+      width: min(1060px, 100%);
+      margin: 0 auto;
+      padding: 22px 16px 38px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #fff;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand small {
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 0.86rem;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(1.65rem, 4vw, 2.35rem);
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: clamp(1.35rem, 3vw, 1.9rem);
+      line-height: 1.25;
+    }
+
+    h3 {
+      font-size: 1.08rem;
+    }
+
+    .shell {
+      background: var(--card);
+      border: 1px solid rgba(219, 227, 239, 0.8);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .home {
+      display: grid;
+      gap: 16px;
+      padding: clamp(16px, 3vw, 28px);
+    }
+
+    .stamp-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      background: #fbfdff;
+    }
+
+    .stamp-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .stamp-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .stamp {
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: var(--muted);
+      background: #fff;
+      font-weight: 800;
+      font-size: 1.12rem;
+    }
+
+    .stamp.done {
+      color: var(--orange);
+      border-color: rgba(242, 138, 46, 0.45);
+      background: #fff8ef;
+    }
+
+    .stamp small {
+      font-weight: 700;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .stamp-message {
+      color: var(--good);
+      font-weight: 800;
+      min-height: 1.4em;
+      font-size: 0.95rem;
+    }
+
+    .streak {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      background: var(--navy);
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-weight: 800;
+    }
+
+    .stage-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stage-button {
+      min-height: 116px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      color: var(--ink);
+      text-align: left;
+      display: grid;
+      align-content: space-between;
+      gap: 12px;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+    }
+
+    .stage-button:hover,
+    .stage-button:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(16, 35, 63, 0.12);
+      border-color: rgba(242, 138, 46, 0.65);
+      outline: none;
+    }
+
+    .stage-title {
+      font-weight: 900;
+      font-size: 1.08rem;
+    }
+
+    .stage-note {
+      color: var(--muted);
+      font-size: 0.91rem;
+    }
+
+    .reset-button {
+      width: fit-content;
+      justify-self: end;
+      background: #fff4ed;
+      color: #8d3e00;
+      border: 1px solid #ffd2ad;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: 800;
+    }
+
+    .game {
+      display: none;
+    }
+
+    .game.active,
+    .home.active {
+      display: grid;
+    }
+
+    .home:not(.active) {
+      display: none;
+    }
+
+    .game-header {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .game-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .back-button,
+    .small-button {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .small-button.dark {
+      background: var(--navy);
+      border-color: var(--navy);
+    }
+
+    .small-button.light {
+      background: #eef3f9;
+      border-color: var(--line);
+      color: var(--navy);
+    }
+
+    .progress-wrap {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .progress {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--orange), var(--yellow));
+      transition: width 0.24s ease;
+    }
+
+    .game-body {
+      padding: clamp(16px, 3vw, 28px);
+      display: grid;
+      gap: 18px;
+    }
+
+    .task-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: clamp(16px, 3vw, 24px);
+      background: #fff;
+      display: grid;
+      gap: 16px;
+    }
+
+    .task-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #eef3f9;
+      color: var(--navy);
+      font-size: 0.86rem;
+      font-weight: 900;
+    }
+
+    .pill.orange {
+      background: #fff2e5;
+      color: #9a4a05;
+    }
+
+    .question {
+      font-size: clamp(1.35rem, 5vw, 2.1rem);
+      line-height: 1.2;
+      font-weight: 950;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .subtext {
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .choice {
+      min-height: 62px;
+      border: 2px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--ink);
+      padding: 12px;
+      font-size: 1.02rem;
+      font-weight: 850;
+      text-align: left;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+      overflow-wrap: anywhere;
+    }
+
+    .choice:hover,
+    .choice:focus-visible {
+      transform: translateY(-1px);
+      border-color: var(--blue);
+      outline: none;
+    }
+
+    .choice.correct {
+      border-color: var(--good);
+      background: #effaf5;
+      color: #0f6e48;
+    }
+
+    .choice.wrong {
+      border-color: var(--bad);
+      background: #fff1ef;
+      color: #9c2c25;
+    }
+
+    .feedback {
+      border-radius: var(--radius);
+      padding: 14px;
+      display: none;
+      gap: 8px;
+      background: #f4f7fb;
+      border: 1px solid var(--line);
+    }
+
+    .feedback.show {
+      display: grid;
+    }
+
+    .feedback.good {
+      background: #effaf5;
+      border-color: #bce8d3;
+    }
+
+    .feedback.bad {
+      background: #fff1ef;
+      border-color: #ffd0ca;
+    }
+
+    .feedback strong {
+      font-size: 1.08rem;
+    }
+
+    .example-box {
+      display: grid;
+      gap: 5px;
+      background: #f8fbff;
+      border-left: 5px solid var(--orange);
+      padding: 12px;
+      border-radius: 6px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .primary {
+      background: var(--orange);
+      color: #221100;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: 950;
+      min-width: 132px;
+      box-shadow: 0 8px 18px rgba(242, 138, 46, 0.26);
+    }
+
+    .secondary {
+      background: #eef3f9;
+      color: var(--navy);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: 900;
+    }
+
+    .word-bank,
+    .answer-zone,
+    .puzzle-grid,
+    .when-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .word-chip {
+      min-height: 48px;
+      background: #fff;
+      border: 2px solid #cdd9e8;
+      border-radius: var(--radius);
+      padding: 10px 13px;
+      color: var(--navy);
+      font-weight: 900;
+      box-shadow: 0 4px 0 #dfe7f2;
+      overflow-wrap: anywhere;
+    }
+
+    .word-chip.selected,
+    .word-chip:disabled {
+      background: #e8edf5;
+      color: #8b96a6;
+      box-shadow: none;
+      transform: translateY(2px);
+    }
+
+    .answer-zone {
+      min-height: 68px;
+      padding: 10px;
+      border: 2px dashed #b9c8db;
+      border-radius: var(--radius);
+      background: #f8fbff;
+    }
+
+    .answer-zone .word-chip {
+      background: #fff8ef;
+      border-color: var(--orange-2);
+      box-shadow: none;
+    }
+
+    .slot-column {
+      flex: 1 1 180px;
+      display: grid;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      background: #fbfdff;
+    }
+
+    .slot-column h3 {
+      color: var(--navy);
+    }
+
+    .slot-column .word-chip {
+      width: 100%;
+      text-align: center;
+      box-shadow: none;
+    }
+
+    .slot-column .word-chip.active {
+      border-color: var(--orange);
+      background: #fff2e5;
+    }
+
+    .structure {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .structure-piece {
+      border-radius: var(--radius);
+      padding: 10px;
+      text-align: center;
+      font-weight: 900;
+      background: #eef3f9;
+      color: var(--navy);
+    }
+
+    .structure-piece.orange {
+      background: #fff2e5;
+      color: #9a4a05;
+    }
+
+    .when-card {
+      flex: 1 1 230px;
+      padding: 14px;
+      border-radius: var(--radius);
+      border: 2px solid var(--line);
+      background: #fff;
+      display: grid;
+      gap: 8px;
+    }
+
+    .when-card.past {
+      border-color: #9cc6f2;
+      background: #f2f8ff;
+    }
+
+    .when-card.progressive {
+      border-color: #ffc98d;
+      background: #fff7ee;
+    }
+
+    .result-screen {
+      display: grid;
+      gap: 14px;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    .score-big {
+      font-size: clamp(2.7rem, 11vw, 5rem);
+      font-weight: 1000;
+      color: var(--navy);
+      line-height: 1;
+    }
+
+    .weak-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .star {
+      position: absolute;
+      color: var(--yellow);
+      font-size: 26px;
+      animation: fly 780ms ease-out forwards;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    }
+
+    @keyframes fly {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.65) rotate(0deg);
+      }
+      18% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-95px) scale(1.25) rotate(18deg);
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        padding: 14px 10px 26px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .stage-grid,
+      .choices,
+      .structure {
+        grid-template-columns: 1fr;
+      }
+
+      .stage-button {
+        min-height: 94px;
+      }
+
+      .game-nav {
+        align-items: flex-start;
+      }
+
+      .game-nav h2 {
+        max-width: 68%;
+      }
+
+      .stamp {
+        min-height: 42px;
+        font-size: 1rem;
+      }
+
+      .stamp small {
+        font-size: 0.64rem;
+      }
+
+      .choice {
+        min-height: 56px;
+      }
+
+      .actions {
+        justify-content: stretch;
+      }
+
+      .actions button {
+        flex: 1 1 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>中2英語 語順ゲーム</h1>
+        <small>過去形・過去進行形・when を短く練習</small>
+      </div>
+      <button class="small-button" id="homeTopButton" type="button">ホーム</button>
+    </header>
+
+    <section class="shell home active" id="homeScreen" aria-label="ホーム">
+      <div class="stamp-card">
+        <div class="stamp-head">
+          <strong>ログインスタンプ</strong>
+          <span id="todayStampMessage" class="stamp-message"></span>
+        </div>
+        <div class="stamp-row" id="stampRow"></div>
+      </div>
+
+      <div class="streak" id="streakText">連続ログイン 0日</div>
+
+      <div>
+        <h2>ステージ選択</h2>
+        <p class="subtext">ひとつ選ぶとすぐ始まります。間違えた問題は復習モードへ入ります。</p>
+      </div>
+
+      <div class="stage-grid" id="stageGrid"></div>
+      <button class="reset-button" id="resetButton" type="button">学習データをリセット</button>
+    </section>
+
+    <section class="shell game" id="gameScreen" aria-label="学習画面">
+      <div class="game-header">
+        <div class="game-nav">
+          <h2 id="stageTitle">ステージ</h2>
+          <button class="back-button" id="backHomeButton" type="button">ホームへ</button>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress" aria-label="進捗"><span id="progressBar"></span></div>
+          <span id="scoreText">0 / 0</span>
+        </div>
+      </div>
+      <div class="game-body" id="gameBody"></div>
+    </section>
+  </main>
+
+  <script>
+    const vocabulary = [
+      { word:"gift", meaning:"贈り物", unit:"Unit1" },
+      { word:"same", meaning:"同じ", unit:"Unit1" },
+      { word:"Busan", meaning:"プサン", unit:"Unit1" },
+      { word:"met", meaning:"会った", unit:"Unit1" },
+      { word:"half", meaning:"半分の", unit:"Unit1" },
+      { word:"else", meaning:"その他に", unit:"Unit1" },
+      { word:"Seoul", meaning:"ソウル", unit:"Unit1" },
+      { word:"for the first time in", meaning:"〜ぶりに", unit:"Unit1" },
+      { word:"half a year", meaning:"半年", unit:"Unit1" },
+      { word:"Long time no see.", meaning:"久しぶりだね", unit:"Unit1" },
+      { word:"What else?", meaning:"他には？", unit:"Unit1" },
+      { word:"read", meaning:"読む", unit:"Unit1" },
+      { word:"rode", meaning:"rideの過去形", unit:"Unit1" },
+      { word:"roller coaster", meaning:"ジェットコースター", unit:"Unit1" },
+      { word:"view", meaning:"景色", unit:"Unit1" },
+      { word:"scary", meaning:"怖い", unit:"Unit1" },
+      { word:"tournament", meaning:"トーナメント", unit:"Unit1" },
+      { word:"coach", meaning:"コーチ", unit:"Unit1" },
+      { word:"other", meaning:"他の", unit:"Unit1" },
+      { word:"choice", meaning:"選択", unit:"Unit1" },
+      { word:"honor", meaning:"光栄なこと", unit:"Unit1" },
+      { word:"come out of", meaning:"〜から出る", unit:"Unit1" },
+      { word:"look for", meaning:"〜を探す", unit:"Unit1" },
+      { word:"There you are!", meaning:"そこにいた", unit:"Unit1" },
+      { word:"I know.", meaning:"そうですよね", unit:"Unit1" },
+      { word:"Can you ～?", meaning:"〜してくれませんか", unit:"Unit1" },
+      { word:"What an honor!", meaning:"なんという栄誉でしょう", unit:"Unit1" },
+      { word:"feel", meaning:"感じる", unit:"Unit1" },
+      { word:"comic book", meaning:"漫画本", unit:"Unit1" },
+      { word:"feel down", meaning:"落ち込む", unit:"Unit1" },
+      { word:"Thursday", meaning:"木曜日", unit:"Unit1" },
+      { word:"sunny", meaning:"晴れた", unit:"Unit1" },
+      { word:"awesome", meaning:"すごい", unit:"Unit1" },
+      { word:"surprised", meaning:"驚いた", unit:"Unit1" },
+      { word:"accept", meaning:"受け入れる", unit:"Unit1" },
+      { word:"offer", meaning:"提案", unit:"Unit1" },
+      { word:"joy", meaning:"喜び", unit:"Unit1" },
+      { word:"talk about", meaning:"〜について話す", unit:"Unit1" },
+      { word:"pass", meaning:"渡す", unit:"Unit2" },
+      { word:"ball", meaning:"ボール", unit:"Unit2" },
+      { word:"problem", meaning:"問題", unit:"Unit2" },
+      { word:"beginner", meaning:"初心者", unit:"Unit2" },
+      { word:"easy", meaning:"簡単な", unit:"Unit2" },
+      { word:"actually", meaning:"実は", unit:"Unit2" },
+      { word:"on the way home", meaning:"家に帰る途中で", unit:"Unit2" },
+      { word:"No problem.", meaning:"問題ありません", unit:"Unit2" },
+      { word:"You think so?", meaning:"そう思いますか", unit:"Unit2" },
+      { word:"action", meaning:"アクション", unit:"Unit2" },
+      { word:"difficult", meaning:"難しい", unit:"Unit2" },
+      { word:"point", meaning:"点数", unit:"Unit2" },
+      { word:"shoot", meaning:"シュートする", unit:"Unit2" },
+      { word:"important", meaning:"重要な", unit:"Unit2" },
+      { word:"stop", meaning:"止める", unit:"Unit2" },
+      { word:"try to", meaning:"〜しようとする", unit:"Unit2" },
+      { word:"It worked.", meaning:"うまくいった", unit:"Unit2" },
+      { word:"Go!", meaning:"行け！", unit:"Unit2" },
+      { word:"win", meaning:"勝つ", unit:"Unit2" },
+      { word:"surfing", meaning:"サーフィン", unit:"Unit2" },
+      { word:"improve", meaning:"改善する", unit:"Unit2" },
+      { word:"be excited about", meaning:"〜にわくわくする", unit:"Unit2" },
+      { word:"perfect", meaning:"完璧な", unit:"Unit2" },
+      { word:"memory", meaning:"思い出", unit:"Unit2" },
+      { word:"cycling", meaning:"サイクリング", unit:"Unit2" },
+      { word:"This is", meaning:"こちらは〜です", unit:"Unit2" },
+      { word:"What's up?", meaning:"どうしたの", unit:"Unit2" },
+      { word:"Why don't you", meaning:"〜してはどうですか", unit:"Unit2" },
+      { word:"come with", meaning:"〜と来る", unit:"Unit2" },
+      { word:"be there", meaning:"そこにいる", unit:"Unit2" },
+      { word:"at first", meaning:"最初は", unit:"Unit2" },
+      { word:"excited", meaning:"興奮した", unit:"Unit2" },
+      { word:"think", meaning:"考える", unit:"Unit2" },
+      { word:"angry", meaning:"怒った", unit:"Unit2" },
+      { word:"nervous", meaning:"緊張して", unit:"Unit2" },
+      { word:"cloudy", meaning:"曇った", unit:"Unit2" },
+      { word:"made", meaning:"makeの過去形", unit:"Unit2" },
+      { word:"myself", meaning:"私自身", unit:"Unit2" },
+      { word:"movie", meaning:"映画", unit:"Unit2" },
+      { word:"order", meaning:"注文する", unit:"Unit2" },
+      { word:"came", meaning:"comeの過去形", unit:"Unit2" },
+      { word:"lend", meaning:"貸す", unit:"Unit2" },
+      { word:"lent", meaning:"貸した", unit:"Unit2" },
+      { word:"something", meaning:"何か", unit:"Unit2" },
+      { word:"surprising", meaning:"驚くような", unit:"Unit2" },
+      { word:"happen", meaning:"起こる", unit:"Unit2" },
+      { word:"find", meaning:"見つける", unit:"Unit2" },
+      { word:"found", meaning:"見つけた", unit:"Unit2" },
+      { word:"by oneself", meaning:"一人で", unit:"Unit2" },
+      { word:"come up", meaning:"近づく", unit:"Unit2" },
+      { word:"have a good time", meaning:"楽しい時間を過ごす", unit:"Unit2" }
+    ];
+
+    const irregularVerbs = [
+      { base:"go", past:"went", jp:"行く" },
+      { base:"see", past:"saw", jp:"見る・会う" },
+      { base:"have", past:"had", jp:"持つ・ある" },
+      { base:"do", past:"did", jp:"する" },
+      { base:"come", past:"came", jp:"来る" },
+      { base:"make", past:"made", jp:"作る" },
+      { base:"take", past:"took", jp:"取る・連れて行く" },
+      { base:"get", past:"got", jp:"得る・着く" },
+      { base:"meet", past:"met", jp:"会う" },
+      { base:"find", past:"found", jp:"見つける" },
+      { base:"lend", past:"lent", jp:"貸す" }
+    ];
+
+    const orderQuestions = [
+      { words:["I","was","studying","English"], answer:["I","was","studying","English"], jp:"私は英語を勉強していました。", hint:"主語 → was/were → 動詞ing → もの" },
+      { words:["My","brother","played","soccer","yesterday"], answer:["My","brother","played","soccer","yesterday"], jp:"私の弟は昨日サッカーをしました。", hint:"主語 → 過去の動作 → もの → 時" },
+      { words:["She","made","a","cake","for","me"], answer:["She","made","a","cake","for","me"], jp:"彼女は私にケーキを作りました。", hint:"だれが → した → 何を → だれに" },
+      { words:["When","I","came","home","my","mother","was","cooking"], answer:["When","I","came","home","my","mother","was","cooking"], jp:"私が帰宅したとき、母は料理をしていました。", hint:"Whenのまとまり → 主語 → was/were → 動詞ing" },
+      { words:["They","were","looking","for","their","coach"], answer:["They","were","looking","for","their","coach"], jp:"彼らはコーチを探していました。", hint:"主語 → were → 動詞ing → 熟語の続き" },
+      { words:["I","met","my","friend","in","Busan"], answer:["I","met","my","friend","in","Busan"], jp:"私はプサンで友だちに会いました。", hint:"主語 → 過去の動作 → だれに → 場所" },
+      { words:["We","had","a","good","time","there"], answer:["We","had","a","good","time","there"], jp:"私たちはそこで楽しい時間を過ごしました。", hint:"主語 → 過去の動作 → まとまり → 場所" },
+      { words:["He","was","reading","a","comic","book"], answer:["He","was","reading","a","comic","book"], jp:"彼は漫画本を読んでいました。", hint:"主語 → was → 動詞ing → もの" }
+    ];
+
+    const progressiveQuestions = [
+      { subject:"I", be:"was", ing:"reading a book", sentence:"I was reading a book.", jp:"私は本を読んでいました。" },
+      { subject:"You", be:"were", ing:"playing tennis", sentence:"You were playing tennis.", jp:"あなたはテニスをしていました。" },
+      { subject:"She", be:"was", ing:"watching a movie", sentence:"She was watching a movie.", jp:"彼女は映画を見ていました。" },
+      { subject:"We", be:"were", ing:"talking about the game", sentence:"We were talking about the game.", jp:"私たちは試合について話していました。" },
+      { subject:"They", be:"were", ing:"looking for the ball", sentence:"They were looking for the ball.", jp:"彼らはボールを探していました。" },
+      { subject:"My father", be:"was", ing:"cycling in the park", sentence:"My father was cycling in the park.", jp:"私の父は公園でサイクリングをしていました。" }
+    ];
+
+    const whenQuestions = [
+      {
+        past:"I came home.",
+        progressive:"My sister was watching TV.",
+        answer:"When I came home, my sister was watching TV.",
+        jp:"私が家に帰ったとき、姉はテレビを見ていました。"
+      },
+      {
+        past:"The coach came up.",
+        progressive:"We were practicing.",
+        answer:"When the coach came up, we were practicing.",
+        jp:"コーチが近づいてきたとき、私たちは練習していました。"
+      },
+      {
+        past:"I saw Ken.",
+        progressive:"He was looking for his bag.",
+        answer:"When I saw Ken, he was looking for his bag.",
+        jp:"私がケンを見かけたとき、彼はバッグを探していました。"
+      },
+      {
+        past:"It started to rain.",
+        progressive:"They were surfing.",
+        answer:"When it started to rain, they were surfing.",
+        jp:"雨が降り始めたとき、彼らはサーフィンをしていました。"
+      },
+      {
+        past:"My mother called me.",
+        progressive:"I was ordering lunch.",
+        answer:"When my mother called me, I was ordering lunch.",
+        jp:"母が私に電話したとき、私は昼食を注文していました。"
+      }
+    ];
+
+    const examples = {
+      gift:["I gave my friend a small gift.", "私は友だちに小さな贈り物をあげました。"],
+      same:["We chose the same movie.", "私たちは同じ映画を選びました。"],
+      Busan:["I visited Busan last spring.", "私はこの前の春にプサンを訪れました。"],
+      met:["I met my old coach yesterday.", "私は昨日、昔のコーチに会いました。"],
+      half:["I ate half a sandwich.", "私はサンドイッチを半分食べました。"],
+      else:["What else did you find?", "他に何を見つけましたか。"],
+      Seoul:["My cousin lives in Seoul.", "私のいとこはソウルに住んでいます。"],
+      "for the first time in":["I saw her for the first time in two years.", "私は2年ぶりに彼女に会いました。"],
+      "half a year":["I studied guitar for half a year.", "私は半年ギターを勉強しました。"],
+      "Long time no see.":["Long time no see. You look happy.", "久しぶりだね。うれしそうだね。"],
+      "What else?":["We need balls and shoes. What else?", "ボールと靴が必要です。他には？"],
+      read:["I read a comic book after dinner.", "私は夕食後に漫画本を読みます。"],
+      rode:["I rode a bike to the park.", "私は公園まで自転車に乗りました。"],
+      "roller coaster":["The roller coaster was scary.", "そのジェットコースターは怖かったです。"],
+      view:["The view from the hill was awesome.", "丘からの景色はすごかったです。"],
+      scary:["The story was a little scary.", "その話は少し怖かったです。"],
+      tournament:["Our team joined a tournament.", "私たちのチームはトーナメントに参加しました。"],
+      coach:["The coach gave us advice.", "コーチは私たちに助言をくれました。"],
+      other:["I tried the other choice.", "私はもう一方の選択を試しました。"],
+      choice:["This choice is important.", "この選択は重要です。"],
+      honor:["It was an honor for me.", "それは私にとって光栄でした。"],
+      "come out of":["A cat came out of the box.", "箱から猫が出てきました。"],
+      "look for":["I was looking for my notebook.", "私はノートを探していました。"],
+      "There you are!":["There you are! I was looking for you.", "そこにいた！あなたを探していました。"],
+      "I know.":["I know. It is difficult.", "そうですよね。それは難しいです。"],
+      "Can you ～?":["Can you pass me the ball?", "ボールを渡してくれませんか。"],
+      "What an honor!":["What an honor! Thank you.", "なんという栄誉でしょう。ありがとう。"],
+      feel:["I feel excited today.", "今日はわくわくしています。"],
+      "comic book":["He was reading a comic book.", "彼は漫画本を読んでいました。"],
+      "feel down":["I feel down on cloudy days.", "曇りの日は落ち込みます。"],
+      Thursday:["We practiced on Thursday.", "私たちは木曜日に練習しました。"],
+      sunny:["It was sunny in the morning.", "朝は晴れていました。"],
+      awesome:["Your idea is awesome.", "あなたの考えはすごいです。"],
+      surprised:["I was surprised at the news.", "私はその知らせに驚きました。"],
+      accept:["I accepted her offer.", "私は彼女の提案を受け入れました。"],
+      offer:["Thank you for your offer.", "提案してくれてありがとう。"],
+      joy:["Music gives me joy.", "音楽は私に喜びをくれます。"],
+      "talk about":["Let's talk about the movie.", "その映画について話しましょう。"]
+    };
+
+    const fallbackExamples = [
+      ["I used this word in my diary.", "私は日記でこの語を使いました。"],
+      ["We practiced this phrase after school.", "私たちは放課後にこの表現を練習しました。"],
+      ["This word helped me understand the story.", "この語は物語を理解する助けになりました。"]
+    ];
+
+    const stages = [
+      { id:"vocab", title:"単語クイズ", note:"英語→日本語、日本語→英語を4択で確認" },
+      { id:"verbs", title:"不規則動詞ゲーム", note:"go → went などをコンボで練習" },
+      { id:"order", title:"語順並べ替え", note:"単語カードをタップして英文を作る" },
+      { id:"progressive", title:"過去進行形パズル", note:"主語 + was/were + 動詞ingを組み合わせる" },
+      { id:"when", title:"whenミッション", note:"起こったことと続いていたことをつなぐ" },
+      { id:"test", title:"ミニテスト", note:"10問ランダムで苦手分野を発見" },
+      { id:"review", title:"復習モード", note:"間違えた問題だけをやり直す" }
+    ];
+
+    const LS = {
+      loginDates:"englishGameLoginDates",
+      lastLogin:"englishGameLastLogin",
+      progress:"englishGameProgress",
+      mistakes:"englishGameMistakes"
+    };
+
+    const state = {
+      stage:null,
+      queue:[],
+      index:0,
+      score:0,
+      total:0,
+      locked:false,
+      current:null,
+      selectedWords:[],
+      combo:0,
+      testMistakes:[],
+      lastResult:null
+    };
+
+    const homeScreen = document.getElementById("homeScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const stageGrid = document.getElementById("stageGrid");
+    const gameBody = document.getElementById("gameBody");
+    const stageTitle = document.getElementById("stageTitle");
+    const progressBar = document.getElementById("progressBar");
+    const scoreText = document.getElementById("scoreText");
+
+    function todayString(offset = 0) {
+      const date = new Date();
+      date.setDate(date.getDate() + offset);
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function loadJSON(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+
+    function saveJSON(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function sample(array, count) {
+      return shuffle(array).slice(0, count);
+    }
+
+    function escapeHTML(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function makeButton(label, className, onClick) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = className;
+      button.textContent = label;
+      button.addEventListener("click", onClick);
+      return button;
+    }
+
+    function updateLoginStamp(awardToday = true) {
+      const today = todayString();
+      const dates = loadJSON(LS.loginDates, []);
+      const uniqueDates = Array.from(new Set(dates));
+      const isNew = awardToday && !uniqueDates.includes(today);
+      if (isNew) {
+        uniqueDates.push(today);
+        saveJSON(LS.loginDates, uniqueDates);
+        localStorage.setItem(LS.lastLogin, today);
+      }
+
+      const row = document.getElementById("stampRow");
+      row.innerHTML = "";
+      for (let i = -6; i <= 0; i++) {
+        const date = todayString(i);
+        const stamp = document.createElement("div");
+        stamp.className = `stamp ${uniqueDates.includes(date) ? "done" : ""}`;
+        stamp.innerHTML = `<span>${uniqueDates.includes(date) ? "★" : "○"}</span><small>${date.slice(5)}</small>`;
+        row.appendChild(stamp);
+      }
+
+      document.getElementById("todayStampMessage").textContent = isNew ? "今日のスタンプGET！" : "";
+      document.getElementById("streakText").textContent = `連続ログイン ${calcStreak(uniqueDates)}日`;
+    }
+
+    function calcStreak(dates) {
+      const set = new Set(dates);
+      let streak = 0;
+      for (let i = 0; i < 365; i++) {
+        if (!set.has(todayString(-i))) break;
+        streak++;
+      }
+      return streak;
+    }
+
+    function renderStageGrid() {
+      stageGrid.innerHTML = "";
+      stages.forEach((stage) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "stage-button";
+        button.innerHTML = `<span class="stage-title">${stage.title}</span><span class="stage-note">${stage.note}</span>`;
+        button.addEventListener("click", () => startStage(stage.id));
+        stageGrid.appendChild(button);
+      });
+    }
+
+    function showHome() {
+      homeScreen.classList.add("active");
+      gameScreen.classList.remove("active");
+      state.stage = null;
+      updateLoginStamp();
+    }
+
+    function showGame() {
+      homeScreen.classList.remove("active");
+      gameScreen.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function setProgress() {
+      const done = Math.min(state.index, state.total);
+      const percent = state.total ? Math.round((done / state.total) * 100) : 0;
+      progressBar.style.width = `${percent}%`;
+      scoreText.textContent = `${state.score} / ${state.total}`;
+    }
+
+    function startStage(id, customQueue) {
+      state.stage = id;
+      state.index = 0;
+      state.score = 0;
+      state.combo = 0;
+      state.locked = false;
+      state.selectedWords = [];
+      state.testMistakes = [];
+      state.lastResult = null;
+
+      const stage = stages.find((item) => item.id === id);
+      stageTitle.textContent = stage ? stage.title : "学習";
+
+      if (customQueue) {
+        state.queue = customQueue;
+      } else if (id === "vocab") {
+        state.queue = sample(vocabulary, 10).map((item) => ({ type:"vocab", data:item, direction:Math.random() > 0.5 ? "ej" : "je" }));
+      } else if (id === "verbs") {
+        state.queue = sample(irregularVerbs, irregularVerbs.length).map((item) => ({ type:"verb", data:item }));
+      } else if (id === "order") {
+        state.queue = sample(orderQuestions, orderQuestions.length).map((item) => ({ type:"order", data:item }));
+      } else if (id === "progressive") {
+        state.queue = sample(progressiveQuestions, progressiveQuestions.length).map((item) => ({ type:"progressive", data:item }));
+      } else if (id === "when") {
+        state.queue = sample(whenQuestions, whenQuestions.length).map((item) => ({ type:"when", data:item }));
+      } else if (id === "test") {
+        state.queue = makeMiniTestQueue();
+      } else if (id === "review") {
+        state.queue = makeReviewQueue();
+      }
+
+      state.total = state.queue.length;
+      showGame();
+      renderNext();
+    }
+
+    function makeMiniTestQueue() {
+      const items = [
+        ...sample(vocabulary, 3).map((data) => ({ type:"vocab", data, direction:Math.random() > 0.5 ? "ej" : "je", test:true })),
+        ...sample(irregularVerbs, 2).map((data) => ({ type:"verb", data, test:true })),
+        ...sample(orderQuestions, 2).map((data) => ({ type:"order", data, test:true })),
+        ...sample(progressiveQuestions, 1).map((data) => ({ type:"progressive", data, test:true })),
+        ...sample(whenQuestions, 2).map((data) => ({ type:"when", data, test:true }))
+      ];
+      return shuffle(items).slice(0, 10);
+    }
+
+    function makeReviewQueue() {
+      const mistakes = loadJSON(LS.mistakes, []);
+      if (!mistakes.length) return [];
+      return shuffle(mistakes).slice(0, 12).map((item) => {
+        if (item.type === "vocab") {
+          const data = vocabulary.find((v) => v.word === item.key) || vocabulary[0];
+          return { type:"vocab", data, direction:item.direction || "ej", review:true };
+        }
+        if (item.type === "verb") {
+          const data = irregularVerbs.find((v) => v.base === item.key) || irregularVerbs[0];
+          return { type:"verb", data, review:true };
+        }
+        if (item.type === "order") {
+          const data = orderQuestions.find((v) => v.answer.join(" ") === item.key) || orderQuestions[0];
+          return { type:"order", data, review:true };
+        }
+        if (item.type === "progressive") {
+          const data = progressiveQuestions.find((v) => v.sentence === item.key) || progressiveQuestions[0];
+          return { type:"progressive", data, review:true };
+        }
+        const data = whenQuestions.find((v) => v.answer === item.key) || whenQuestions[0];
+        return { type:"when", data, review:true };
+      });
+    }
+
+    function renderNext() {
+      state.locked = false;
+      state.selectedWords = [];
+      setProgress();
+      if (!state.total) {
+        renderEmptyReview();
+        return;
+      }
+      if (state.index >= state.total) {
+        renderResult();
+        return;
+      }
+      state.current = state.queue[state.index];
+      if (state.current.type === "vocab") renderVocab(state.current);
+      if (state.current.type === "verb") renderVerb(state.current);
+      if (state.current.type === "order") renderOrder(state.current);
+      if (state.current.type === "progressive") renderProgressive(state.current);
+      if (state.current.type === "when") renderWhen(state.current);
+    }
+
+    function cardShell(metaHTML, questionHTML, contentHTML, actionsHTML = "") {
+      gameBody.innerHTML = `
+        <div class="task-card">
+          <div class="task-meta">${metaHTML}</div>
+          <div class="question">${questionHTML}</div>
+          ${contentHTML}
+          <div class="feedback" id="feedback"></div>
+          <div class="actions" id="actions">${actionsHTML}</div>
+        </div>
+      `;
+    }
+
+    function renderVocab(item) {
+      const data = item.data;
+      const isEnglishToJapanese = item.direction === "ej";
+      const correct = isEnglishToJapanese ? data.meaning : data.word;
+      const pool = vocabulary
+        .filter((v) => v.word !== data.word)
+        .map((v) => isEnglishToJapanese ? v.meaning : v.word);
+      const choices = shuffle([correct, ...sample(pool, 3)]);
+      cardShell(
+        `<span class="pill">${data.unit}</span><span>単語 ${state.index + 1}/${state.total}</span>`,
+        escapeHTML(isEnglishToJapanese ? data.word : data.meaning),
+        `<p class="subtext">${isEnglishToJapanese ? "日本語を選ぼう" : "英語を選ぼう"}</p><div class="choices" id="choices"></div>`
+      );
+      renderChoices(choices, correct, (ok, chosen) => {
+        const ex = examples[data.word] || fallbackExamples[Math.floor(Math.random() * fallbackExamples.length)];
+        const goodHTML = `
+          <strong>いいね。意味と形がつながったよ。</strong>
+          <div class="example-box">
+            <b>${escapeHTML(data.word)} = ${escapeHTML(data.meaning)}</b>
+            <span>${escapeHTML(ex[0])}</span>
+            <span>${escapeHTML(ex[1])}</span>
+          </div>`;
+        const badHTML = `
+          <strong>正解は ${escapeHTML(correct)}。</strong>
+          <span>${escapeHTML(data.word)} は「${escapeHTML(data.meaning)}」。例文でまとまりごと覚えよう。</span>`;
+        finishAnswer(ok, goodHTML, badHTML, { type:"vocab", key:data.word, direction:item.direction, label:data.word });
+      });
+    }
+
+    function renderVerb(item) {
+      const data = item.data;
+      const choices = shuffle([data.past, ...sample(irregularVerbs.filter((v) => v.past !== data.past).map((v) => v.past), 3)]);
+      cardShell(
+        `<span class="pill orange">コンボ ${state.combo}</span><span>不規則動詞 ${state.index + 1}/${state.total}</span>`,
+        `${escapeHTML(data.base)} → ?`,
+        `<p class="subtext">過去形を選ぼう。「昨日したこと」は過去形。</p><div class="choices" id="choices"></div>`
+      );
+      renderChoices(choices, data.past, (ok) => {
+        const goodHTML = `<strong>カード完成。${escapeHTML(data.base)} → ${escapeHTML(data.past)}</strong><span>${escapeHTML(data.jp)} の過去形として使えるよ。</span>`;
+        const badHTML = `<strong>正解は ${escapeHTML(data.past)}。</strong><span>${escapeHTML(data.base)} は形が大きく変わるタイプ。音でセットにしよう。</span>`;
+        finishAnswer(ok, goodHTML, badHTML, { type:"verb", key:data.base, label:`${data.base} → ${data.past}` });
+      }, true);
+    }
+
+    function renderChoices(choices, correct, callback, cardEffect = false) {
+      const area = document.getElementById("choices");
+      choices.forEach((choice) => {
+        const button = makeButton(choice, "choice", () => {
+          if (state.locked) return;
+          state.locked = true;
+          const ok = choice === correct;
+          [...area.children].forEach((child) => {
+            child.disabled = true;
+            if (child.textContent === correct) child.classList.add("correct");
+          });
+          button.classList.add(ok ? "correct" : "wrong");
+          callback(ok, choice);
+          if (ok && cardEffect) {
+            button.animate([
+              { transform:"scale(1)" },
+              { transform:"scale(1.04)" },
+              { transform:"scale(1)" }
+            ], { duration:320, easing:"ease-out" });
+          }
+        });
+        area.appendChild(button);
+      });
+    }
+
+    function renderOrder(item) {
+      const data = item.data;
+      state.selectedWords = [];
+      cardShell(
+        `<span class="pill">語順</span><span>${state.index + 1}/${state.total}</span><span>ヒント: ${escapeHTML(data.hint)}</span>`,
+        escapeHTML(data.jp),
+        `
+          <p class="subtext">英文の順番にカードをタップしよう。</p>
+          <div class="structure">
+            <div class="structure-piece">主語</div>
+            <div class="structure-piece orange">動作・状態</div>
+            <div class="structure-piece">場所・時</div>
+          </div>
+          <div class="answer-zone" id="answerZone" aria-label="答え"></div>
+          <div class="word-bank" id="wordBank"></div>
+        `,
+        `<button class="secondary" id="undoButton" type="button">1つ戻す</button><button class="primary" id="checkButton" type="button">チェック</button>`
+      );
+      const bank = document.getElementById("wordBank");
+      shuffle(data.words.map((word, index) => ({ word, index }))).forEach((token) => {
+        const button = makeButton(token.word, "word-chip", () => {
+          if (state.locked || button.disabled) return;
+          state.selectedWords.push(token);
+          button.disabled = true;
+          button.classList.add("selected");
+          renderAnswerZone();
+        });
+        button.dataset.index = token.index;
+        bank.appendChild(button);
+      });
+      document.getElementById("undoButton").addEventListener("click", undoWord);
+      document.getElementById("checkButton").addEventListener("click", () => checkOrder(data));
+      renderAnswerZone();
+    }
+
+    function renderAnswerZone() {
+      const zone = document.getElementById("answerZone");
+      if (!zone) return;
+      zone.innerHTML = "";
+      state.selectedWords.forEach((token) => {
+        const chip = document.createElement("span");
+        chip.className = "word-chip";
+        chip.textContent = token.word;
+        zone.appendChild(chip);
+      });
+    }
+
+    function undoWord() {
+      if (state.locked || !state.selectedWords.length) return;
+      const token = state.selectedWords.pop();
+      const button = [...document.getElementById("wordBank").children].find((child) => Number(child.dataset.index) === token.index);
+      if (button) {
+        button.disabled = false;
+        button.classList.remove("selected");
+      }
+      renderAnswerZone();
+    }
+
+    function checkOrder(data) {
+      if (state.locked) return;
+      const answer = state.selectedWords.map((token) => token.word);
+      if (answer.length !== data.answer.length) {
+        showFeedback(false, `<strong>まだカードが残っています。</strong><span>全部のカードを使うと英文になります。</span>`);
+        return;
+      }
+      state.locked = true;
+      const ok = answer.join(" ") === data.answer.join(" ");
+      const goodHTML = `<strong>語順OK。</strong><div class="example-box"><b>${escapeHTML(data.answer.join(" "))}</b><span>${escapeHTML(data.jp)}</span></div>`;
+      const badHTML = `<strong>正しい語順はこれです。</strong><div class="example-box"><b>${escapeHTML(data.answer.join(" "))}</b><span>英語は「だれが → どうした → 何を/どこで/いつ」が見えるように並ぶよ。</span></div>`;
+      finishAnswer(ok, goodHTML, badHTML, { type:"order", key:data.answer.join(" "), label:data.jp });
+    }
+
+    function renderProgressive(item) {
+      const data = item.data;
+      const subjects = shuffle([data.subject, ...sample(progressiveQuestions.filter((q) => q.subject !== data.subject).map((q) => q.subject), 3)]);
+      const bes = shuffle([data.be, data.be === "was" ? "were" : "was"]);
+      const ings = shuffle([data.ing, ...sample(progressiveQuestions.filter((q) => q.ing !== data.ing).map((q) => q.ing), 3)]);
+      cardShell(
+        `<span class="pill">過去進行形</span><span>${state.index + 1}/${state.total}</span>`,
+        "「〜していました」を作ろう",
+        `
+          <p class="subtext">主語 → was/were → 動詞ing の3つを選ぼう。</p>
+          <div class="puzzle-grid" id="puzzleGrid">
+            ${columnHTML("主語", "subject", subjects)}
+            ${columnHTML("was / were", "be", bes)}
+            ${columnHTML("動詞ing", "ing", ings)}
+          </div>
+          <div class="answer-zone" id="puzzleAnswer"></div>
+        `,
+        `<button class="primary" id="checkPuzzle" type="button">チェック</button>`
+      );
+      state.puzzle = { subject:null, be:null, ing:null };
+      document.querySelectorAll("[data-puzzle]").forEach((button) => {
+        button.addEventListener("click", () => {
+          if (state.locked) return;
+          const part = button.dataset.part;
+          document.querySelectorAll(`[data-part="${part}"]`).forEach((b) => b.classList.remove("active"));
+          button.classList.add("active");
+          state.puzzle[part] = button.textContent;
+          updatePuzzleAnswer();
+        });
+      });
+      document.getElementById("checkPuzzle").addEventListener("click", () => checkProgressive(data));
+      updatePuzzleAnswer();
+    }
+
+    function columnHTML(title, part, values) {
+      return `
+        <div class="slot-column">
+          <h3>${escapeHTML(title)}</h3>
+          ${values.map((value) => `<button class="word-chip" data-puzzle="1" data-part="${part}" type="button">${escapeHTML(value)}</button>`).join("")}
+        </div>
+      `;
+    }
+
+    function updatePuzzleAnswer() {
+      const zone = document.getElementById("puzzleAnswer");
+      if (!zone) return;
+      zone.innerHTML = ["subject", "be", "ing"].map((part) => `<span class="word-chip">${escapeHTML(state.puzzle[part] || "？")}</span>`).join("");
+    }
+
+    function checkProgressive(data) {
+      if (state.locked) return;
+      if (!state.puzzle.subject || !state.puzzle.be || !state.puzzle.ing) {
+        showFeedback(false, `<strong>3つ選ぶと完成です。</strong><span>主語、was/were、動詞ingを1つずつ選ぼう。</span>`);
+        return;
+      }
+      state.locked = true;
+      const ok = state.puzzle.subject === data.subject && state.puzzle.be === data.be && state.puzzle.ing === data.ing;
+      const goodHTML = `<strong>完成。</strong><div class="example-box"><b>${escapeHTML(data.sentence)}</b><span>${escapeHTML(data.jp)}</span></div>`;
+      const badHTML = `<strong>正解は ${escapeHTML(data.sentence)}</strong><span>${escapeHTML(data.subject)} には ${escapeHTML(data.be)} を合わせます。</span>`;
+      finishAnswer(ok, goodHTML, badHTML, { type:"progressive", key:data.sentence, label:data.sentence });
+    }
+
+    function renderWhen(item) {
+      const data = item.data;
+      const choices = shuffle([
+        data.answer,
+        data.answer.replace("When ", "").replace(",", " when"),
+        data.progressive.replace(".", "") + " when " + data.past.toLowerCase(),
+        "When " + data.progressive.replace(".", "").toLowerCase() + ", " + data.past.toLowerCase()
+      ]);
+      cardShell(
+        `<span class="pill">when</span><span>${state.index + 1}/${state.total}</span>`,
+        "2文をつなげよう",
+        `
+          <div class="when-grid">
+            <div class="when-card past"><b>起こったこと</b><span>${escapeHTML(data.past)}</span></div>
+            <div class="when-card progressive"><b>続いていたこと</b><span>${escapeHTML(data.progressive)}</span></div>
+          </div>
+          <p class="subtext">When + 起こったこと, 続いていたこと。</p>
+          <div class="choices" id="choices"></div>
+        `
+      );
+      renderChoices(choices, data.answer, (ok) => {
+        const goodHTML = `<strong>つながりました。</strong><div class="example-box"><b>${escapeHTML(data.answer)}</b><span>${escapeHTML(data.jp)}</span></div>`;
+        const badHTML = `<strong>正解はこの形。</strong><div class="example-box"><b>${escapeHTML(data.answer)}</b><span>whenの中は「起こったこと」、後ろは「続いていたこと」。</span></div>`;
+        finishAnswer(ok, goodHTML, badHTML, { type:"when", key:data.answer, label:data.jp });
+      });
+    }
+
+    function showFeedback(ok, html) {
+      const feedback = document.getElementById("feedback");
+      feedback.className = `feedback show ${ok ? "good" : "bad"}`;
+      feedback.innerHTML = html;
+    }
+
+    function finishAnswer(ok, goodHTML, badHTML, mistake) {
+      if (ok) {
+        state.score++;
+        state.combo++;
+        showFeedback(true, goodHTML);
+        burstStars();
+      } else {
+        state.combo = 0;
+        showFeedback(false, badHTML);
+        saveMistake(mistake);
+        if (state.stage === "test") state.testMistakes.push(mistake);
+      }
+      saveProgress();
+      setProgress();
+      const actions = document.getElementById("actions");
+      actions.innerHTML = "";
+      actions.appendChild(makeButton(state.index + 1 >= state.total ? "結果を見る" : "次へ", "primary", () => {
+        state.index++;
+        renderNext();
+      }));
+    }
+
+    function saveMistake(mistake) {
+      const mistakes = loadJSON(LS.mistakes, []);
+      const record = { ...mistake, date:todayString() };
+      const filtered = mistakes.filter((item) => !(item.type === record.type && item.key === record.key));
+      filtered.unshift(record);
+      saveJSON(LS.mistakes, filtered.slice(0, 80));
+    }
+
+    function saveProgress() {
+      const progress = loadJSON(LS.progress, {});
+      const id = state.stage || "unknown";
+      progress[id] = {
+        played:(progress[id]?.played || 0) + 1,
+        best:Math.max(progress[id]?.best || 0, state.score),
+        last:todayString()
+      };
+      saveJSON(LS.progress, progress);
+    }
+
+    function renderResult() {
+      setProgress();
+      const percent = state.total ? Math.round((state.score / state.total) * 100) : 0;
+      const weak = state.stage === "test" ? getWeakAreas(state.testMistakes) : [];
+      const missedQueue = state.stage === "test" ? mistakesToQueue(state.testMistakes) : [];
+      gameBody.innerHTML = `
+        <div class="task-card result-screen">
+          <span class="pill orange">結果</span>
+          <div class="score-big">${state.score}/${state.total}</div>
+          <h2>${percent >= 80 ? "かなりいい感じ" : percent >= 50 ? "あと少しで安定" : "ここから伸ばそう"}</h2>
+          <p class="subtext">正解数 ${state.score}問 / ${state.total}問</p>
+          ${weak.length ? `<div><h3>苦手分野</h3><div class="weak-list">${weak.map((w) => `<span class="pill">${escapeHTML(w)}</span>`).join("")}</div></div>` : ""}
+          <div class="actions">
+            <button class="secondary" id="againButton" type="button">もう一度</button>
+            ${missedQueue.length ? `<button class="primary" id="missedButton" type="button">間違えた問題だけ</button>` : ""}
+            <button class="secondary" id="homeResultButton" type="button">ホームへ</button>
+          </div>
+        </div>
+      `;
+      document.getElementById("againButton").addEventListener("click", () => startStage(state.stage));
+      document.getElementById("homeResultButton").addEventListener("click", showHome);
+      const missedButton = document.getElementById("missedButton");
+      if (missedButton) missedButton.addEventListener("click", () => startStage("review", missedQueue));
+    }
+
+    function getWeakAreas(mistakes) {
+      const labels = {
+        vocab:"単語",
+        verb:"不規則動詞",
+        order:"語順",
+        progressive:"過去進行形",
+        when:"when"
+      };
+      return Array.from(new Set(mistakes.map((item) => labels[item.type] || item.type)));
+    }
+
+    function mistakesToQueue(mistakes) {
+      saveJSON(LS.mistakes, [...mistakes, ...loadJSON(LS.mistakes, [])].slice(0, 80));
+      return mistakes.map((item) => {
+        if (item.type === "vocab") return { type:"vocab", data:vocabulary.find((v) => v.word === item.key) || vocabulary[0], direction:item.direction || "ej", review:true };
+        if (item.type === "verb") return { type:"verb", data:irregularVerbs.find((v) => v.base === item.key) || irregularVerbs[0], review:true };
+        if (item.type === "order") return { type:"order", data:orderQuestions.find((v) => v.answer.join(" ") === item.key) || orderQuestions[0], review:true };
+        if (item.type === "progressive") return { type:"progressive", data:progressiveQuestions.find((v) => v.sentence === item.key) || progressiveQuestions[0], review:true };
+        return { type:"when", data:whenQuestions.find((v) => v.answer === item.key) || whenQuestions[0], review:true };
+      });
+    }
+
+    function renderEmptyReview() {
+      progressBar.style.width = "0%";
+      scoreText.textContent = "0 / 0";
+      gameBody.innerHTML = `
+        <div class="task-card result-screen">
+          <span class="pill">復習</span>
+          <h2>まだ復習リストは空です</h2>
+          <p class="subtext">単語クイズやミニテストで間違えた問題が、ここに入ります。</p>
+          <div class="actions">
+            <button class="primary" id="goVocab" type="button">単語クイズへ</button>
+            <button class="secondary" id="emptyHome" type="button">ホームへ</button>
+          </div>
+        </div>
+      `;
+      document.getElementById("goVocab").addEventListener("click", () => startStage("vocab"));
+      document.getElementById("emptyHome").addEventListener("click", showHome);
+    }
+
+    function burstStars() {
+      const box = document.getElementById("stars");
+      for (let i = 0; i < 9; i++) {
+        const star = document.createElement("span");
+        star.className = "star";
+        star.textContent = "★";
+        star.style.left = `${35 + Math.random() * 30}%`;
+        star.style.top = `${42 + Math.random() * 18}%`;
+        star.style.animationDelay = `${i * 28}ms`;
+        box.appendChild(star);
+        setTimeout(() => star.remove(), 1000);
+      }
+    }
+
+    function resetAll() {
+      const ok = confirm("スタンプ・進捗・復習リストをすべてリセットします。よろしいですか？");
+      if (!ok) return;
+      Object.values(LS).forEach((key) => localStorage.removeItem(key));
+      homeScreen.classList.add("active");
+      gameScreen.classList.remove("active");
+      updateLoginStamp(false);
+    }
+
+    document.getElementById("backHomeButton").addEventListener("click", showHome);
+    document.getElementById("homeTopButton").addEventListener("click", showHome);
+    document.getElementById("resetButton").addEventListener("click", resetAll);
+
+    renderStageGrid();
+    updateLoginStamp();
+
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

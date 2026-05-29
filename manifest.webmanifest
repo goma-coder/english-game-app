@@ -1,0 +1,19 @@
+{
+  "name": "中2英語 語順ゲーム",
+  "short_name": "中2英語",
+  "description": "中2英語の過去形・過去進行形・when・語順を学べる学習アプリ",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef3f9",
+  "theme_color": "#10233f",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
