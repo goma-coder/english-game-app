@@ -604,6 +604,24 @@
       background: #fff7ee;
     }
 
+    .reading-passage {
+      display: grid;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--blue);
+      border-radius: var(--radius);
+      background: #f8fbff;
+      padding: 14px;
+      font-size: clamp(1rem, 3vw, 1.16rem);
+      font-weight: 750;
+    }
+
+    .reading-passage span {
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 800;
+    }
+
     .result-screen {
       display: grid;
       gap: 14px;
@@ -641,6 +659,23 @@
       text-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
     }
 
+    .combo-pop {
+      position: fixed;
+      left: 50%;
+      top: 42%;
+      z-index: 11;
+      transform: translate(-50%, -50%);
+      border-radius: 999px;
+      background: var(--orange);
+      color: #221100;
+      padding: 14px 22px;
+      font-size: clamp(1.35rem, 7vw, 2.3rem);
+      font-weight: 1000;
+      box-shadow: 0 16px 34px rgba(242, 138, 46, 0.34);
+      animation: comboPop 900ms ease-out forwards;
+      pointer-events: none;
+    }
+
     @keyframes fly {
       0% {
         opacity: 0;
@@ -652,6 +687,25 @@
       100% {
         opacity: 0;
         transform: translateY(-95px) scale(1.25) rotate(18deg);
+      }
+    }
+
+    @keyframes comboPop {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -35%) scale(0.72);
+      }
+      18% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.08);
+      }
+      72% {
+        opacity: 1;
+        transform: translate(-50%, -55%) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -90%) scale(0.96);
       }
     }
 
@@ -911,6 +965,54 @@
       }
     ];
 
+    const readingQuestions = [
+      {
+        title:"久しぶりに会った友だち",
+        passage:"I met my friend in Busan last Sunday. We talked for the first time in half a year. She gave me a small gift, and I was surprised.",
+        jp:"私は先週の日曜日、プサンで友だちに会いました。私たちは半年ぶりに話しました。彼女は私に小さな贈り物をくれて、私は驚きました。",
+        question:"筆者が驚いた理由は？",
+        answer:"友だちが小さな贈り物をくれたから",
+        choices:["友だちが小さな贈り物をくれたから", "プサンの景色が怖かったから", "半年間ずっと料理をしていたから", "コーチを探していたから"],
+        point:"gave me a small gift と I was surprised のつながりを見る。"
+      },
+      {
+        title:"帰り道のできごと",
+        passage:"On the way home, I saw Kota. He was looking for his ball. I helped him, and we found it near the gate.",
+        jp:"帰り道、私はコウタを見かけました。彼はボールを探していました。私は彼を手伝い、私たちは門の近くでそれを見つけました。",
+        question:"コウタは何をしていましたか？",
+        answer:"ボールを探していた",
+        choices:["ボールを探していた", "映画を注文していた", "ジェットコースターに乗っていた", "昼食を作っていた"],
+        point:"was looking for が「探していた」を表す。"
+      },
+      {
+        title:"試合のあと",
+        passage:"Our team joined a tournament. At first, I was nervous, but my coach said, \"No problem.\" His words made me feel better.",
+        jp:"私たちのチームはトーナメントに参加しました。最初、私は緊張していましたが、コーチが「問題ないよ」と言いました。その言葉で私は気分がよくなりました。",
+        question:"最初、筆者はどんな気持ちでしたか？",
+        answer:"緊張していた",
+        choices:["緊張していた", "怒っていた", "退屈していた", "眠っていた"],
+        point:"At first と nervous の組み合わせを確認する。"
+      },
+      {
+        title:"雨が降り始めたとき",
+        passage:"When it started to rain, my sister was cycling in the park. She came home soon, but she had a good time.",
+        jp:"雨が降り始めたとき、姉は公園でサイクリングをしていました。彼女はすぐ帰宅しましたが、楽しい時間を過ごしました。",
+        question:"雨が降り始めたとき、姉は何をしていましたか？",
+        answer:"公園でサイクリングをしていた",
+        choices:["公園でサイクリングをしていた", "漫画本を読んでいた", "昼食を注文していた", "コーチに会っていた"],
+        point:"When の中は起こったこと、後ろは続いていたこと。"
+      },
+      {
+        title:"落ち込んだ日",
+        passage:"I felt down on Thursday. My friend lent me a comic book. I read it after dinner, and it gave me joy.",
+        jp:"木曜日、私は落ち込んでいました。友だちが私に漫画本を貸してくれました。私は夕食後にそれを読み、喜びをもらいました。",
+        question:"友だちは筆者に何をしましたか？",
+        answer:"漫画本を貸した",
+        choices:["漫画本を貸した", "ボールを渡した", "映画を作った", "景色を見せた"],
+        point:"lent me a comic book は「私に漫画本を貸した」。"
+      }
+    ];
+
     const examples = {
       gift:["I gave my friend a small gift.", "私は友だちに小さな贈り物をあげました。"],
       same:["We chose the same movie.", "私たちは同じ映画を選びました。"],
@@ -960,10 +1062,11 @@
 
     const stages = [
       { id:"vocab", title:"単語クイズ", note:"英語→日本語、日本語→英語を4択で確認" },
-      { id:"verbs", title:"不規則動詞ゲーム", note:"go → went などをコンボで練習" },
+      { id:"reading", title:"内容理解クイズ", note:"短い英文を読んで意味をつかむ" },
+      { id:"verbs", title:"過去形はどれ？", note:"go → went などをコンボで練習" },
       { id:"order", title:"語順並べ替え", note:"単語カードをタップして英文を作る" },
       { id:"progressive", title:"過去進行形パズル", note:"主語 + was/were + 動詞ingを組み合わせる" },
-      { id:"when", title:"whenミッション", note:"起こったことと続いていたことをつなぐ" },
+      { id:"when", title:"2つの文をつなげよう", note:"起こったことと続いていたことをつなぐ" },
       { id:"test", title:"ミニテスト", note:"10問ランダムで苦手分野を発見" },
       { id:"review", title:"復習モード", note:"間違えた問題だけをやり直す" }
     ];
@@ -1134,6 +1237,8 @@
         state.queue = customQueue;
       } else if (id === "vocab") {
         state.queue = sample(vocabulary, 10).map((item) => ({ type:"vocab", data:item, direction:Math.random() > 0.5 ? "ej" : "je" }));
+      } else if (id === "reading") {
+        state.queue = sample(readingQuestions, readingQuestions.length).map((item) => ({ type:"reading", data:item }));
       } else if (id === "verbs") {
         state.queue = sample(irregularVerbs, irregularVerbs.length).map((item) => ({ type:"verb", data:item }));
       } else if (id === "order") {
@@ -1156,8 +1261,9 @@
     function makeMiniTestQueue() {
       const items = [
         ...sample(vocabulary, 3).map((data) => ({ type:"vocab", data, direction:Math.random() > 0.5 ? "ej" : "je", test:true })),
+        ...sample(readingQuestions, 1).map((data) => ({ type:"reading", data, test:true })),
         ...sample(irregularVerbs, 2).map((data) => ({ type:"verb", data, test:true })),
-        ...sample(orderQuestions, 2).map((data) => ({ type:"order", data, test:true })),
+        ...sample(orderQuestions, 1).map((data) => ({ type:"order", data, test:true })),
         ...sample(progressiveQuestions, 1).map((data) => ({ type:"progressive", data, test:true })),
         ...sample(whenQuestions, 2).map((data) => ({ type:"when", data, test:true }))
       ];
@@ -1184,6 +1290,10 @@
           const data = progressiveQuestions.find((v) => v.sentence === item.key) || progressiveQuestions[0];
           return { type:"progressive", data, review:true };
         }
+        if (item.type === "reading") {
+          const data = readingQuestions.find((v) => v.title === item.key) || readingQuestions[0];
+          return { type:"reading", data, review:true };
+        }
         const data = whenQuestions.find((v) => v.answer === item.key) || whenQuestions[0];
         return { type:"when", data, review:true };
       });
@@ -1203,6 +1313,7 @@
       }
       state.current = state.queue[state.index];
       if (state.current.type === "vocab") renderVocab(state.current);
+      if (state.current.type === "reading") renderReading(state.current);
       if (state.current.type === "verb") renderVerb(state.current);
       if (state.current.type === "order") renderOrder(state.current);
       if (state.current.type === "progressive") renderProgressive(state.current);
@@ -1250,11 +1361,33 @@
       });
     }
 
+    function renderReading(item) {
+      const data = item.data;
+      const choices = shuffle(data.choices);
+      cardShell(
+        `<span class="pill">内容理解</span><span>${state.index + 1}/${state.total}</span><span>${escapeHTML(data.title)}</span>`,
+        escapeHTML(data.question),
+        `
+          <div class="reading-passage">
+            <span>英文</span>
+            <p>${escapeHTML(data.passage)}</p>
+          </div>
+          <p class="subtext">英文の中の「だれが・何を・いつ」を見つけよう。</p>
+          <div class="choices" id="choices"></div>
+        `
+      );
+      renderChoices(choices, data.answer, (ok) => {
+        const goodHTML = `<strong>読めています。</strong><div class="example-box"><b>${escapeHTML(data.answer)}</b><span>${escapeHTML(data.jp)}</span></div>`;
+        const badHTML = `<strong>正解は ${escapeHTML(data.answer)}。</strong><span>${escapeHTML(data.point)}</span>`;
+        finishAnswer(ok, goodHTML, badHTML, { type:"reading", key:data.title, label:data.title });
+      });
+    }
+
     function renderVerb(item) {
       const data = item.data;
       const choices = shuffle([data.past, ...sample(irregularVerbs.filter((v) => v.past !== data.past).map((v) => v.past), 3)]);
       cardShell(
-        `<span class="pill orange">コンボ ${state.combo}</span><span>不規則動詞 ${state.index + 1}/${state.total}</span>`,
+        `<span class="pill orange">コンボ ${state.combo}</span><span>過去形 ${state.index + 1}/${state.total}</span>`,
         `${escapeHTML(data.base)} → ?`,
         `<p class="subtext">過去形を選ぼう。「昨日したこと」は過去形。</p><div class="choices" id="choices"></div>`
       );
@@ -1466,7 +1599,7 @@
         state.score++;
         state.combo++;
         showFeedback(true, goodHTML);
-        burstStars();
+        burstStars(state.stage === "verbs" && state.combo >= 2 ? `${state.combo}コンボ！` : "");
       } else {
         state.combo = 0;
         showFeedback(false, badHTML);
@@ -1530,10 +1663,11 @@
     function getWeakAreas(mistakes) {
       const labels = {
         vocab:"単語",
-        verb:"不規則動詞",
+        reading:"内容理解",
+        verb:"過去形",
         order:"語順",
         progressive:"過去進行形",
-        when:"when"
+        when:"2文接続"
       };
       return Array.from(new Set(mistakes.map((item) => labels[item.type] || item.type)));
     }
@@ -1543,6 +1677,7 @@
       return mistakes.map((item) => {
         if (item.type === "vocab") return { type:"vocab", data:vocabulary.find((v) => v.word === item.key) || vocabulary[0], direction:item.direction || "ej", review:true };
         if (item.type === "verb") return { type:"verb", data:irregularVerbs.find((v) => v.base === item.key) || irregularVerbs[0], review:true };
+        if (item.type === "reading") return { type:"reading", data:readingQuestions.find((v) => v.title === item.key) || readingQuestions[0], review:true };
         if (item.type === "order") return { type:"order", data:orderQuestions.find((v) => v.answer.join(" ") === item.key) || orderQuestions[0], review:true };
         if (item.type === "progressive") return { type:"progressive", data:progressiveQuestions.find((v) => v.sentence === item.key) || progressiveQuestions[0], review:true };
         return { type:"when", data:whenQuestions.find((v) => v.answer === item.key) || whenQuestions[0], review:true };
@@ -1567,7 +1702,7 @@
       document.getElementById("emptyHome").addEventListener("click", showHome);
     }
 
-    function burstStars() {
+    function burstStars(comboText = "") {
       const box = document.getElementById("stars");
       for (let i = 0; i < 9; i++) {
         const star = document.createElement("span");
@@ -1578,6 +1713,13 @@
         star.style.animationDelay = `${i * 28}ms`;
         box.appendChild(star);
         setTimeout(() => star.remove(), 1000);
+      }
+      if (comboText) {
+        const combo = document.createElement("span");
+        combo.className = "combo-pop";
+        combo.textContent = comboText;
+        box.appendChild(combo);
+        setTimeout(() => combo.remove(), 1000);
       }
     }
 
